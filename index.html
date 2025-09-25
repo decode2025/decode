@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <title>Decode Award 2025 badge</title>
+
+  <style>
+    /* Saját fontok betöltése */
+    @font-face {
+      font-family: "ABCProphet";
+      src: url("ABCProphet-Light.woff2") format("woff2");
+      font-weight: 300;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: "ABCProphet";
+      src: url("ABCProphet-Regular.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    body {
+      font-family: "ABCProphet", sans-serif;
+      font-weight: 300; /* alapértelmezett Light */
+      text-align: center;
+      background-color: #fdfdfd;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      font-weight: 400; /* Regular */
+      font-size: 2em;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-weight: 300; /* Light */
+      font-size: 1.1em;
+      color: #555;
+      margin: 5px 0;
+    }
+
+    canvas {
+      max-width: 100%;
+      margin-top: 20px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Decode Award 2025 badge</h1>
+  <p>Upload a picture, and the badge will be added automatically.</p>
+  <p>Tölts fel egy képet, és automatikusan rákerül a badge.</p>
+
+  <input type="file" id="upload" accept="image/*"><br>
+  <canvas id="canvas"></canvas><br>
+  <button id="download" style="display:none;">Download</button>
+
+  <script>
+    const upload = document.getElementById("upload");
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const download = document.getElementById("download");
+
+    const frame = new Image();
+    frame.src = "frame.png"; // a badge keret
+
+    upload.addEventListener("change", function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const img = new Image();
+      img.onload = function() {
+        const size = Math.min(img.width, img.height);
+        canvas.width = size;
+        canvas.height = size;
+
+        ctx.clearRect(0,0,size,size);
+
+        // Kép középre vágva
+        ctx.drawImage(img,
+          (img.width - size) / 2,
+          (img.height - size) / 2,
+          size, size,
+          0, 0, size, size
+        );
+
+        // Keret rá
+        frame.onload = function() {
+          ctx.drawImage(frame, 0, 0, size, size);
+        }
+        if (frame.complete) ctx.drawImage(frame, 0, 0, size, size);
+
+        download.style.display = "inline-block";
+      }
+      img.src = URL.createObjectURL(file);
+    });
+
+    download.addEventListener("click", function() {
+      const link = document.createElement("a");
+      link.download = "badge.png";
+      link.href = canvas.toDataURL();
+      link.click();
+    });
+  </script>
+</body>
+</html>
